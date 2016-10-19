@@ -1,4 +1,8 @@
-# ashlar
+# flash outline
+
+This is for flash outline and written in ashlar framework.
+
+## about ashlar 
 
 Workflow template for statistical computing projects at [Stephens Lab](http://stephenslab.uchicago.edu/). 
 

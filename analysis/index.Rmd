@@ -9,5 +9,4 @@ title: "Home"
 
 ## Analysis
 
-*  [An exmaple: using PCA to visualize some single-cell data](single-cell-pca.html)
 *  [Estimation of rank](rankestimation.html)
