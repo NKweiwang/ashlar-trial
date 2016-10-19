@@ -9,10 +9,10 @@
 <meta name="generator" content="pandoc" />
 
 
-<meta name="author" content="First Last" />
+<meta name="author" content="Wei Wang" />
 
 
-<title>Untitled</title>
+<title>Rank Estimation</title>
 
 <script src="libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -173,26 +173,45 @@ $(document).ready(function () {
 
 
 
-<h1 class="title toc-ignore">Untitled</h1>
-<h4 class="author"><em>First Last</em></h4>
+<h1 class="title toc-ignore">Rank Estimation</h1>
+<h4 class="author"><em>Wei Wang</em></h4>
 <h4 class="date"><em>YYYY-MM-DD</em></h4>
 
 </div>
 
 <div id="TOC">
 <ul>
-<li><a href="#section-title">Section title</a></li>
+<li><a href="#apply-to-check-the-rank-estimation">apply to check the rank estimation</a></li>
 <li><a href="#session-information">Session information</a></li>
 </ul>
 </div>
 
 <p><strong>Last updated:</strong> 2016-10-19</p>
 <p><strong>Code version:</strong> 48598d7490fa829a8555a08e015c15d586655ee4</p>
-<p>This is a template for writing reports with R Markdown.</p>
-<div id="section-title" class="section level2">
-<h2>Section title</h2>
-<p>You can create a new file from the template using the command <code>cp</code>.</p>
-<pre class="bash"><code>cp analysis/template.Rmd analysis/newfile.Rmd</code></pre>
+<div id="apply-to-check-the-rank-estimation" class="section level2">
+<h2>apply to check the rank estimation</h2>
+<pre class="r"><code>sim_K = function(K, N, P, SF, SL, signal,noise){
+  E = matrix(rnorm(N*P,0,noise),nrow=N)
+  Y = E
+  L_true = array(0, dim = c(N,K))
+  F_true = array(0, dim = c(P,K))
+  
+  for(k in 1:K){
+    lstart = rnorm(N, 0, signal)
+    fstart = rnorm(P, 0, signal)
+    
+    index = sample(seq(1:N),(N*SL))
+    lstart[index] = 0
+    index = sample(seq(1:P),(P*SF))
+    fstart[index] = 0
+    
+    L_true[,k] = lstart
+    F_true[,k] = fstart
+    
+    Y = Y + lstart %*% t(fstart)
+  }
+  return(list(Y = Y, L_true = L_true, F_true = F_true, Error = E))
+}</code></pre>
 </div>
 <div id="session-information" class="section level2">
 <h2>Session information</h2>
