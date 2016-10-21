@@ -10,3 +10,4 @@ title: "Home"
 ## Analysis
 
 *  [Estimation of rank](rankestimation.html)
+*  [Example for preparing DSC](preDCS.html)
