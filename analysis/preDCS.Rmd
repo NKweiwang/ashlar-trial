@@ -1,0 +1,266 @@
+---
+title: "example for Gao: simple simulation"
+output: html_document
+---
+
+Here is a example for running several methods we need to make comparison.
+
+## data generation
+
+We simulated the data as following 
+
+```{}
+set.seed(100)
+N = 100
+P = 200
+K = 2
+L_true = array(0,dim = c(N,K))
+F_true = array(1,dim = c(P,K))
+F_true[,1] = rnorm(P,0,1)
+F_true[,2] = rnorm(P,0,1)
+# F_true = scale(F_true)
+L_true[1:30,1] = abs(rnorm(30,0,1))
+L_true[1:30,2] = 0
+L_true[31:60,1] = 0
+L_true[31:60,2] = abs(rnorm(30,0,1))
+L_true[61:100,1] = abs(rnorm(40,0,0.5))
+L_true[61:100,2] = abs(rnorm(40,0,0.5))
+G = L_true %*% t(F_true)
+# generate Y
+E = matrix(rnorm(N*P,0,2),nrow=N)
+Y = L_true %*% t(F_true) + E
+```
+
+Then we need to restore the data into rds and mat file
+
+```{}
+data = list(Y = Y, L = L_true, F = F_true, Error = E)
+saveRDS(data,file = "test_2.rds")
+# write the data into matlab
+writeMat("test_2.mat", data = data)
+```
+
+## FLASH
+
+Flasd method is simple and straight forward.
+
+```{}
+g_flash = flashr::greedy(Y,K = 5)
+g_b_flash = flashr::backfitting(Y,initial_list = g_flash)
+# we need to save the list g_b_flash
+```
+
+## SFA in R
+
+```{}
+SFA.wrapper = function(X, K){
+  N = dim(X)[1]
+  P = dim(X)[2]
+  
+  if(file.exists("SFAout")){
+    unlink("SFAout", recursive= T)
+  }
+  system("mkdir SFAout")
+  
+  write.table(X,file="dscsfa.txt",row.names=F,col.names=F)
+  # sfa command line on cluster
+  # ~/flash/simulation/methods/sfa/src/sfa -gen ./dscsfamix.txt -g 600 -k 1 -n 200 -iter 100 -rand 999 -o ./SFAout/sfa
+  
+  # sqrt(mean(( loadings %*% factor - test$L_true%*%t(test$F_true))^2))/sqrt(mean((test$L_true%*%t(test$F_true))^2))
+  system(paste("~/flash/simulation/methods/sfa/src/sfa", "-gen", "./dscsfa.txt", "-g", N, "-k", K,
+               "-n", P, "-iter", 100, "-rand", 999, "-o", "./SFAout/sfa", sep=" "))
+  
+  if(file.info("./SFAout/sfa_F.out")$size == 1){
+    return(list(L = 0, F = 0))
+  } else{
+    Fhat=read.table("./SFAout/sfa_F.out")
+    lambda=read.table("./SFAout/sfa_lambda.out")
+    Fhat=as.matrix(Fhat)
+    lambda=as.matrix(lambda)
+    return(list(L = lambda, F = Fhat))
+  }
+  
+}
+
+gsfa = SFA.wrapper(t(Y), K = 2)
+```
+
+### SFA part in command line (3 parts)
+
+#### in R 
+
+Write the data into a .txt file
+
+```{}
+write.table(X,file="dscsfa.txt",row.names=F,col.names=F)
+```
+
+Then we create a folder to restore the result and then run the sfa into that folder. Here our sfa we need to know the path of the data file, the sfa software and the output folder.
+
+#### in commad line for C++
+
+```{}
+mkdir SFAout
+~/flash/simulation/methods/sfa/src/sfa -gen ./dscsfamix.txt -g 600 -k 1 -n 200 -iter 100 -rand 999 -o ./SFAout/sfa
+```
+
+#### in R 
+
+then we can cd into the output folder and load the result by R
+
+```{}
+if(file.info("./SFAout/sfa_F.out")$size == 1){
+    return(list(L = 0, F = 0))
+  } else{
+    Fhat=read.table("./SFAout/sfa_F.out")
+    lambda=read.table("./SFAout/sfa_lambda.out")
+    Fhat=as.matrix(Fhat)
+    lambda=as.matrix(lambda)
+    return(list(L = lambda, F = Fhat))
+  }
+```
+
+## SFAmix
+
+### SFAmix in R
+
+To apply SFAmix in R is similar with SFA in R
+
+```{}
+SFAmix.wrapper = function(X,K){
+  N = dim(X)[1]
+  P = dim(X)[2]
+  
+  write.table(X,file="dscsfamix.txt",row.names=F,col.names=F)
+  print(class(X))
+  print(dim(X))
+  
+  if(file.exists("SFAmixout")){
+    unlink("SFAmixout", recursive= T)
+  }
+  system("mkdir SFAmixout")
+  
+  # ~/mvash/mvsim/SFAmix/SFAmix --nf K --y dscrsfamix.txt --out SFAmixout --sep space
+  # this is run on the PPS cluster
+  system(paste("~/mvash/mvsim/SFAmix/SFAmix","--nf",K,"--y","dscsfamix.txt","--out",
+               "SFAmixout","--sep","space",sep=" "))
+  
+  alpha=read.table("./SFAmixout/PSI")
+  
+  if(file.info("./SFAmixout/EX")$size == 1){
+    return(list(L = 0, F = 0))
+  } else{
+    Fhat=read.table("./SFAmixout/EX")
+    lambda=read.table("./SFAmixout/LAM")
+    Psi=as.vector(alpha)
+    Fhat=as.matrix(Fhat)
+    lambda=as.matrix(lambda)
+    P=dim(lambda)[2]
+    n=dim(Fhat)[1]
+    return(list(L = Fhat, F = lambda))
+  }
+  
+}
+#http://www.bioinformatics.org/labnotes/dr-tree/dsc/20160630/benchmark.html
+```
+
+### SFAmix in command line (3 parts)
+
+#### in R
+
+```{}
+write.table(X,file="dscsfamix.txt",row.names=F,col.names=F)
+```
+
+#### in command line
+
+```{}
+mkdir SFAmixout
+~/mvash/mvsim/SFAmix/SFAmix --nf K --y dscrsfamix.txt --out SFAmixout --sep space
+```
+
+#### in R
+
+```{}
+alpha=read.table("./SFAmixout/PSI")
+  
+  if(file.info("./SFAmixout/EX")$size == 1){
+    return(list(L = 0, F = 0))
+  } else{
+    Fhat=read.table("./SFAmixout/EX")
+    lambda=read.table("./SFAmixout/LAM")
+    Psi=as.vector(alpha)
+    Fhat=as.matrix(Fhat)
+    lambda=as.matrix(lambda)
+    P=dim(lambda)[2]
+    n=dim(Fhat)[1]
+    return(list(L = Fhat, F = lambda))
+  }
+```
+
+## PMA
+
+This is in R, so it is also simple.
+
+```{}
+PMA_K.wrapper = function(Y,K){
+  library(PMA)
+  out = PMD(Y,K = K)
+  residual_PMD = Y - out$d * out$u %*% t(out$v)
+  return(list(d = out$d, u = out$u, v = out$v, residual = residual_PMD))
+}
+```
+
+
+## KSVD
+
+We need to interact with matlab, so also need 3 steps
+
+#### in R
+
+We need write this R list into matlab list
+
+```{}
+writeMat("test_2.mat", data = data)
+```
+
+#### in matlab
+
+We use the the matlab list that we just create to get the result restored into .mat file again. We need to provide the path of matlab soft ware.
+
+```{}
+addpath(genpath('~/HG/ash-sfa/Rcode/postmean/flash_simulation/comparison/methods/KSVD/KSVD_Matlab_ToolBox'));
+load test_2.mat
+
+param.L = 1;   % number of elements in each linear combination.
+param.K = 2; % number of dictionary elements
+param.numIteration = 50; % number of iteration to execute the K-SVD algorithm.
+
+param.errorFlag = 0; % decompose signals until a certain error is reached. do not use fix number of coefficients.
+%param.errorGoal = sigma;
+param.preserveDCAtom = 0;
+
+D = (data.Y)';
+%%%%%%%% initial dictionary: Dictionary elements %%%%%%%%
+param.InitializationMethod =  'DataElements';
+
+param.displayProgress = 1;
+disp('Starting to  train the dictionary');
+
+[Dictionary,output]  = KSVD(D,param);
+result.Dic = Dictionary;
+result.loading = output.CoefMatrix;
+save KSVDtest_2_L1 result;
+```
+
+#### in R
+
+read the matlav list into R list for further comparison.
+
+```{}
+g_KSVD_L2 = readMat("KSVDtest_2_L2.mat",sparseMatrixClass="matrix")
+```
+
+## NBSFA
+
+The structure is same as KSVD.
