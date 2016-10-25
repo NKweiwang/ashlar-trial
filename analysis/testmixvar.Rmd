@@ -1,0 +1,161 @@
+---
+title: "test the mix variance structure"
+author: "wei"
+date: 2016-10-25
+output: 
+  html_document:
+    css: layout/floating-toc.css
+    toc: true
+---
+
+**Last updated:** `r Sys.Date()`
+
+**Code version:** `r system("git log -1 --format='%H'", intern = TRUE)`
+
+```{r chunk-options, include=FALSE}
+source("layout/chunk-options.R")
+```
+
+## generate data
+
+```{r}
+sim_data = function(N, P, SF, SL, signal,
+                    a = rchisq(N,3), b = rchisq(P,1),
+                    mu = 1, K = 6, positive = FALSE){
+  
+  E = matrix(rep(0,N*P),nrow=N)
+  sig2_true = matrix(rep(0,N*P),nrow=N)
+  for(i in 1:N){
+    for(j in 1:P){
+      sig2_true[i,j] = mu + a[i] * b[j]
+      E[i,j] = rnorm(1,0,sqrt(sig2_true[i,j]))
+    }
+  }
+  
+  Y = E
+  L_true = array(0, dim = c(N,K))
+  F_true = array(0, dim = c(P,K))
+  
+  for(k in 1:K){
+    lstart = rnorm(N, 0, signal)
+    fstart = rnorm(P, 0, signal)
+    
+    index = sample(seq(1:N),(N*SL))
+    lstart[index] = 0
+    index = sample(seq(1:P),(P*SF))
+    fstart[index] = 0
+    
+    if(positive == TRUE){
+      lstart = abs(lstart)
+      fstart = abs(fstart)
+    }
+    
+    L_true[,k] = lstart
+    F_true[,k] = fstart
+    
+    Y = Y + lstart %*% t(fstart)
+  }
+  
+  return(list(Y = Y, L_true = L_true, F_true = F_true, Error = E,sig2_true = sig2_true))
+}
+```
+
+## try the rank one case
+
+### we set the variance is a constant plus a columnwise structure variance.
+
+```{r}
+set.seed(100)
+N = 60
+P = 100
+SF = 0.5
+SL = 0.8
+data = sim_data(N, P, SF, SL, a = rep(1,N), b = rchisq(P,1), mu = 1.5, signal = 1,K = 1)
+
+plot(svd(data$Y)$d)
+# data$sig2_true
+
+# First test the flash rank one case.
+g_flash = flashr::flash(data$Y,partype = "noisy_col",sigmae2_true = matrix(1.5,ncol = P, nrow = N))
+plot((data$sig2_true[1,]), g_flash$sigmae2[1,])
+abline(0,1)
+
+
+set.seed(100)
+N = 60
+P = 100
+SF = 0.5
+SL = 0.8
+data = sim_data(N, P, SF, SL,a = rep(1,N), b = rchisq(P,1), mu = 0.2, signal = 2,K = 1)
+
+plot(svd(data$Y)$d)
+# data$sig2_true
+
+# First test the flash rank one case.
+g_flash = flashr::flash(data$Y,partype = "noisy_col",sigmae2_true = matrix(0.2,ncol = P, nrow = N))
+plot((data$sig2_true[1,]), g_flash$sigmae2[1,])
+abline(0,1)
+
+```
+
+### known constant plus a unknown constant
+
+```{r}
+set.seed(100)
+N = 60
+P = 100
+SF = 0.5
+SL = 0.8
+data = sim_data(N, P, SF, SL,a = rep(1,N), b = rep(2,P), mu = 0.2, signal = 2,K = 1)
+
+plot(svd(data$Y)$d)
+g_flash = flashr::flash(data$Y,partype = "noisy",sigmae2_true = matrix(0.2,ncol = P, nrow = N))
+c((data$sig2_true[1,1]), g_flash$sigmae2[1,1])
+
+```
+
+## test for the rank K, for the backfitting algorithm we only use 10 iterations
+
+### known constant plus unknown constant
+
+```{r}
+set.seed(100)
+N = 60
+P = 100
+SF = 0.5
+SL = 0.8
+data = sim_data(N, P, SF, SL,a = rep(1,N), b = rep(2,P), mu = 1, signal = 2,K = 6)
+plot(svd(data$Y)$d)
+g_flash = flashr::greedy(data$Y,K = 9,
+                         flash_para = list(partype = "noisy",sigmae2_true = matrix(1,ncol = P, nrow = N)))
+b_flash = flashr::backfitting(data$Y,initial_list = g_flash, maxiter_bf = 10, 
+                              flash_para = list(partype = "noisy",sigmae2_true = matrix(1,ncol = P, nrow = N)))
+
+c(data$sig2_true[1,1],(b_flash$sigmae2[[6]])[1,1])
+```
+
+
+### known constant plus unknows columnwise structure
+
+```{r}
+set.seed(100)
+N = 60
+P = 100
+SF = 0.5
+SL = 0.8
+data = sim_data(N, P, SF, SL,a = rep(1,N), b = rchisq(P,1), mu = 1, signal = 2,K = 6)
+plot(svd(data$Y)$d)
+g_flash = flashr::greedy(data$Y,K = 9,
+                         flash_para = list(partype = "noisy_col",sigmae2_true = matrix(1,ncol = P, nrow = N)))
+b_flash = flashr::backfitting(data$Y,initial_list = g_flash, maxiter_bf = 10, 
+                              flash_para = list(partype = "noisy_col",sigmae2_true = matrix(1,ncol = P, nrow = N)))
+plot((data$sig2_true[1,]), (b_flash$sigmae2[[6]])[1,])
+abline(0,1)
+```
+
+
+## Session information
+
+```{r info, echo = FALSE}
+sessionInfo()
+```

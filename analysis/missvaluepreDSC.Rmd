@@ -1,0 +1,28 @@
+---
+title: "Example for pre DSC on missing value"
+author: "Wei Wang"
+date: YYYY-MM-DD
+output: 
+  html_document:
+    css: layout/floating-toc.css
+    toc: true
+---
+
+**Last updated:** `r Sys.Date()`
+
+**Code version:** `r system("git log -1 --format='%H'", intern = TRUE)`
+
+```{r chunk-options, include=FALSE}
+source("layout/chunk-options.R")
+```
+
+## R package
+
+
+## matlab package
+
+## Session information
+
+```{r info, echo = FALSE}
+sessionInfo()
+```
