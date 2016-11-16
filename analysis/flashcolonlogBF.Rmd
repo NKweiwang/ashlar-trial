@@ -1,0 +1,65 @@
+---
+title: "logBF from Siming's data (cancer somatic)"
+author: "weiwang"
+date: YYYY-MM-DD
+output: 
+  html_document:
+    css: layout/floating-toc.css
+    toc: true
+---
+
+**Last updated:** `r Sys.Date()`
+
+**Code version:** `r system("git log -1 --format='%H'", intern = TRUE)`
+
+```{r chunk-options, include=FALSE}
+source("layout/chunk-options.R")
+```
+
+## we got 17 factor for flash with colum wise variance structure
+
+we check the factor and loading, and we also take the sign into account
+
+### factor 1
+
+- leading tissue : All
+- relevant tissues : "STAD" "UCEC" 
+- positive : "SKCM"
+- negative : "BLCA" "BRCA" "CESC" "ESCA" "HNSC" "KIRC" "LIHC" "STAD" "UCEC"
+
+for the loadings (genes)
+
+- leading gene: "ABCC8"    "ANK3"     "ARID2"    "CASR"     "CNTNAP2"  "CRB1"     "CTCF"     "DNAH7"    "DSCAM"    "GRIN2B"   "HCN1"     "KIAA1109" "MGAM" "MYH1"     "MYO7B"    "PAPPA"    "PAPPA2"   "PBRM1"    "PPP6C"    "SCN10A"   "SCN11A"   "SDK1"     "SLC14A2"  "SYNE1"    "VHL" 
+- positive gene: "ARID2"    "KIAA1109" "MYO7B"    "PPP6C"    "SDK1"     "SYNE1"
+- negative gene: "ABCC8"   "ANK3"    "CASR"    "CNTNAP2" "CRB1"    "CTCF"    "DNAH7"   "DSCAM"   "GRIN2B"  "HCN1"    "MGAM"    "MYH1"    "PAPPA"   "PAPPA2" "PBRM1"   "SCN10A"  "SCN11A"  "SLC14A2" "VHL" 
+
+
+### factor 2
+
+- leading tissue : "SKCM"
+- relevant tissues : "STAD" "UCEC" 
+- positive : "SKCM"
+- negative : "BLCA" "BRCA" "CESC" "ESCA" "HNSC" "KIRC" "LIHC" "STAD" "UCEC"
+
+for the loadings (genes)
+
+- leading gene: "ABCC8"    "ANK3"     "ARID2"    "CASR"     "CNTNAP2"  "CRB1"     "CTCF"     "DNAH7"    "DSCAM"    "GRIN2B"   "HCN1"     "KIAA1109" "MGAM" "MYH1"     "MYO7B"    "PAPPA"    "PAPPA2"   "PBRM1"    "PPP6C"    "SCN10A"   "SCN11A"   "SDK1"     "SLC14A2"  "SYNE1"    "VHL" 
+- positive gene: "ARID2"    "KIAA1109" "MYO7B"    "PPP6C"    "SDK1"     "SYNE1"
+- negative gene: "ABCC8"   "ANK3"    "CASR"    "CNTNAP2" "CRB1"    "CTCF"    "DNAH7"   "DSCAM"   "GRIN2B"  "HCN1"    "MGAM"    "MYH1"    "PAPPA"   "PAPPA2" "PBRM1"   "SCN10A"  "SCN11A"  "SLC14A2" "VHL" 
+
+### factor 3
+
+- leading tissue : "BLCA" "BRCA" "ESCA" "GBM"  "HNSC" "LGG"  "LIHC" "LUAD" "LUSC" "PAAD" "SARC" "STAD" "UCEC" "UCS"
+- negative : all
+
+for the loadings (genes)
+
+- leading gene: "TP53"
+
+
+
+## Session information
+
+```{r info, echo = FALSE}
+sessionInfo()
+```
