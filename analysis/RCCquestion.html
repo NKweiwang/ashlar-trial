@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+<meta name="author" content="First Last" />
+
+
+<title>RCC array jobs</title>
+
+<script src="libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="libs/bootstrap-3.3.5/css/united.min.css" rel="stylesheet" />
+<script src="libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+
+<style type="text/css">
+
+/* padding for bootstrap navbar */
+body {
+  padding-top: 50px;
+  padding-bottom: 40px;
+}
+
+
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h2 {
+  padding-top: 55px;
+  margin-top: -55px;
+}
+.section h3 {
+  padding-top: 55px;
+  margin-top: -55px;
+}
+
+
+
+/* don't use link color in navbar */
+.dropdown-menu>li>a {
+  color: black;
+}
+
+/* some padding for disqus */
+#disqus_thread {
+  margin-top: 45px;
+}
+
+</style>
+
+<link rel="stylesheet" href="libs/font-awesome-4.1.0/css/font-awesome.min.css"/>
+
+<style type="text/css">code{white-space: pre;}</style>
+<link rel="stylesheet"
+      href="libs/highlight/textmate.css"
+      type="text/css" />
+<script src="libs/highlight/highlight.js"></script>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs && document.readyState && document.readyState === "complete") {
+   window.setTimeout(function() {
+      hljs.initHighlighting();
+   }, 0);
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+<link rel="stylesheet" href="layout/floating-toc.css" type="text/css" />
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script src="libs/navigation-1.1/tabsets.js"></script>
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+
+
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">flash</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="license.html">License</a></li>
+        <li><a href="https://github.com/nkweiwang/ashlar-trial">GitHub</a></li>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">RCC array jobs</h1>
+<h4 class="author"><em>First Last</em></h4>
+<h4 class="date"><em>YYYY-MM-DD</em></h4>
+
+</div>
+
+<div id="TOC">
+<ul>
+<li><a href="#in-pps-cluster">In pps cluster</a><ul>
+<li><a href="#scripts-in-pps">scripts in PPS</a></li>
+</ul></li>
+<li><a href="#rcc-case">RCC case</a><ul>
+<li><a href="#questions">questions</a></li>
+</ul></li>
+<li><a href="#thanks-a-lot">Thanks a lot!</a></li>
+<li><a href="#session-information">Session information</a></li>
+</ul>
+</div>
+
+<p><strong>Last updated:</strong> 2016-11-18</p>
+<p><strong>Code version:</strong> a90593a97f44cea7be2258bc57a94e5ec12670f8</p>
+<p>This is a template for writing reports with R Markdown.</p>
+<div id="in-pps-cluster" class="section level2">
+<h2>In pps cluster</h2>
+<p>I have done something as following to run a .R file multiple times:</p>
+<div id="scripts-in-pps" class="section level3">
+<h3>scripts in PPS</h3>
+<div id="r-function" class="section level4">
+<h4>R function</h4>
+<pre><code>args&lt;-commandArgs(TRUE)
+g_file=args[1]
+
+library(&quot;MASS&quot;)
+N = 100
+P = 200
+# all the code .....
+# ......
+# and then I got the result I would like to restore
+result=cbind(beta,vbb,vbp,lvbb,lvbp)
+write.table(result, g_file)  </code></pre>
+<p>The <code>args</code> here is from the shell script shown below. In the command <code>Rscript --verbose ${IPATH}/diag10.R ${OUTPATH}/output${i}.txt</code> we pass the argument into R file and give the value to <code>g_file</code> to write the result into a .txt file.</p>
+</div>
+<div id="shell-script" class="section level4">
+<h4>shell script</h4>
+<pre><code>#!/bin/sh                                                                     
+#$ -t 1-50
+#$ -o /mnt/lustre/home/weidong/lvbsim/diag/diag10.out                         
+#$ -e /mnt/lustre/home/weidong/lvbsim/diag/diag10.error                       
+      
+INDIR=/mnt/lustre/home/weidong/lvbsim/diag                                    
+IPATH=/mnt/lustre/home/weidong/lvbsim/diag                                    
+OUTPATH=/mnt/lustre/home/weidong/lvbsim/diag/diag10out
+    
+cd  ${INDIR}
+for ((i=1; i&lt;=50; i++))                                                       
+do
+if ((i==${SGE_TASK_ID})); then                                                
+Rscript --verbose ${IPATH}/diag10.R ${OUTPATH}/output${i}.txt                 
+fi
+done
+</code></pre>
+<p>In this way, I run my diag10.R file 50 times and restore the reslut into “OUTPATH=/mnt/lustre/home/weidong/lvbsim/diag/diag10out” with name called output1.txt … output50.txt</p>
+</div>
+</div>
+</div>
+<div id="rcc-case" class="section level2">
+<h2>RCC case</h2>
+<p>I want to do similar thing using .sbatch</p>
+<p>I can’t access the RCC cluster now to show my script.</p>
+<p>Here is the psuedo code</p>
+<div id="r-function-1" class="section level4">
+<h4>R function</h4>
+<pre><code># generate the data 
+Y = data_gen(...)$Y
+miss_index = data_gen(..)$missindex
+system(&quot;mkdir NSFAout&quot;)
+writeMat(miss_index,&quot;./NSFAout/missindex.mat&quot;)
+g_pma = pma(Y,miss_index)
+g_flash = flash(Y,miss_index)
+# and other methods...
+
+# call this matlab function 
+system(&quot;matlab -nospalsh -nodesktop -r \&quot;run(&#39;...&#39;) ;exit; \&quot; &quot;) # just call the command line to apply matlab function
+# In this matlab function, we restore the result into &quot;./NSFAout/nsfaresult.mat&quot;
+g_nsfa = readMat(&quot;./NSFAout/nsfaresult.mat&quot;)
+
+result = c(g_pma$rmse, g_flash$rmse, g_nsfa$rmse)
+
+</code></pre>
+</div>
+<div id="sbatch-script" class="section level4">
+<h4>sbatch script</h4>
+<pre><code>#!/bin/bash
+
+#SBATCH --job-name=arrayJob
+#SBATCH --output=arrayJob_%A_%a.out
+#SBATCH --error=arrayJob_%A_%a.err
+#SBATCH --array=1-16
+#SBATCH --time=01:00:00
+#SBATCH --partition=sandyb
+#SBATCH --ntasks=1
+#SBATCH --mem-per-cpu=4000
+
+
+######################
+# Begin work section #
+######################
+
+# Print this sub-job&#39;s task ID
+mkdir test$$SLURM_ARRAY_TASK_ID
+# this make a directory called test1 .... test16...
+cd test$$SLURM_ARRAY_TASK_ID
+Rscript --verbose Rcc_wrapper.R
+</code></pre>
+</div>
+<div id="questions" class="section level3">
+<h3>questions</h3>
+<ul>
+<li><p>I tried the <code>args</code> this in .sbatch and .R script and it doesn’t work. Is there any to pass this argument in the .sbatch file into R file just like what pps example did?</p></li>
+<li><p>I tried the <code>INDIR=/mnt/lustre/home/weidong/lvbsim/diag</code> and <code>cd ${INDIR}</code> in .sbatch script and it doesn’t work. Is there any way to do that?</p></li>
+<li><p>Could you please show some example to run .R file multiple time in RCC and point to specific output directory with the output file having name like output1.txt, ….output10.txt… Within this process, I have need to creat some folder called test1 … test10 to restore my missindex.mat file each time.</p></li>
+</ul>
+<div id="more-details" class="section level4">
+<h4>more details</h4>
+<p>I am running 4 methods on missing data imputation and compare them. So for each data I have, I would like to generate some index and throw away the data points corresponding to these index. By applying those 4 methods we can predict the missing value and compare with the true value which we throw away. In this way we can calculate the RMSE for this data and this missing index. I would like to this many times.</p>
+<p>Let’s say I would do this procedure 100 times on each data. For each time, I need to restore the missing index somewhere as a .mat file to run matlab function. I also need to restore the output of the matlab funtion to compare with the output of R functions. I would like restore all the output into a .txt file somewhere in each time to aggregate the result finally.</p>
+<p>I kind of make this procedure work but in a very silly way. I think the solution in the PPS example is better and neat. Is there any way I can do something in RCC similar with the PPS example?</p>
+</div>
+</div>
+</div>
+<div id="thanks-a-lot" class="section level2">
+<h2>Thanks a lot!</h2>
+</div>
+<div id="session-information" class="section level2">
+<h2>Session information</h2>
+<pre><code>R version 3.2.4 (2016-03-10)
+Platform: x86_64-apple-darwin13.4.0 (64-bit)
+Running under: OS X 10.12.1 (unknown)
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] knitr_1.14
+
+loaded via a namespace (and not attached):
+ [1] magrittr_1.5    formatR_1.4     tools_3.2.4     htmltools_0.3.5
+ [5] yaml_2.1.13     Rcpp_0.12.7     stringi_1.1.2   rmarkdown_1.0  
+ [9] stringr_1.1.0   digest_0.6.10   evaluate_0.10  </code></pre>
+</div>
+
+
+<!-- some extra javascript for older browsers -->
+<script type="text/javascript" src="libs/polyfill.js"></script>
+
+<script>
+
+// manage active state of menu based on current page
+$(document).ready(function () {
+
+    // active menu
+    href = window.location.pathname
+    href = href.substr(href.lastIndexOf('/') + 1)
+    $('a[href="' + href + '"]').parent().addClass('active');
+
+    // manage active menu header
+    if (href.startsWith('authoring_'))
+      $('a[href="' + 'authoring' + '"]').parent().addClass('active');
+    else if (href.endsWith('_format.html'))
+      $('a[href="' + 'formats' + '"]').parent().addClass('active');
+    else if (href.startsWith('developer_'))
+      $('a[href="' + 'developer' + '"]').parent().addClass('active');
+
+});
+
+</script>
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+$(document).ready(function () {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+});
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

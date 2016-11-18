@@ -1,0 +1,158 @@
+---
+title: "RCC array jobs"
+author: "First Last"
+date: YYYY-MM-DD
+output: 
+  html_document:
+    css: layout/floating-toc.css
+    toc: true
+---
+
+**Last updated:** `r Sys.Date()`
+
+**Code version:** `r system("git log -1 --format='%H'", intern = TRUE)`
+
+```{r chunk-options, include=FALSE}
+source("layout/chunk-options.R")
+```
+
+This is a template for writing reports with R Markdown.
+
+## In pps cluster
+
+I have done something as following to run a .R file multiple times:
+
+### scripts in PPS
+
+#### R function
+
+```
+args<-commandArgs(TRUE)
+g_file=args[1]
+
+library("MASS")
+N = 100
+P = 200
+# all the code .....
+# ......
+# and then I got the result I would like to restore
+result=cbind(beta,vbb,vbp,lvbb,lvbp)
+write.table(result, g_file)  
+```
+
+The `args` here is from the shell script shown below. In the command `Rscript --verbose ${IPATH}/diag10.R ${OUTPATH}/output${i}.txt` we pass the argument into R file and give the value to `g_file` to write the result into a .txt file.
+
+#### shell script
+
+```
+#!/bin/sh                                                                     
+#$ -t 1-50
+#$ -o /mnt/lustre/home/weidong/lvbsim/diag/diag10.out                         
+#$ -e /mnt/lustre/home/weidong/lvbsim/diag/diag10.error                       
+      
+INDIR=/mnt/lustre/home/weidong/lvbsim/diag                                    
+IPATH=/mnt/lustre/home/weidong/lvbsim/diag                                    
+OUTPATH=/mnt/lustre/home/weidong/lvbsim/diag/diag10out
+    
+cd  ${INDIR}
+for ((i=1; i<=50; i++))                                                       
+do
+if ((i==${SGE_TASK_ID})); then                                                
+Rscript --verbose ${IPATH}/diag10.R ${OUTPATH}/output${i}.txt                 
+fi
+done
+
+```
+
+In this way, I run my diag10.R file 50 times and restore the reslut into "OUTPATH=/mnt/lustre/home/weidong/lvbsim/diag/diag10out" with name called output1.txt ... output50.txt
+
+## RCC case
+
+I want to do similar thing using .sbatch
+
+I can't access the RCC cluster now to show my script. 
+
+Here is the psuedo code 
+
+#### R function 
+
+```
+# generate the data 
+Y = data_gen(...)$Y
+miss_index = data_gen(..)$missindex
+system("mkdir NSFAout")
+writeMat(miss_index,"./NSFAout/missindex.mat")
+g_pma = pma(Y,miss_index)
+g_flash = flash(Y,miss_index)
+# and other methods...
+
+# call this matlab function 
+system("matlab -nospalsh -nodesktop -r \"run('...') ;exit; \" ") # just call the command line to apply matlab function
+# In this matlab function, we restore the result into "./NSFAout/nsfaresult.mat"
+g_nsfa = readMat("./NSFAout/nsfaresult.mat")
+
+result = c(g_pma$rmse, g_flash$rmse, g_nsfa$rmse)
+
+
+```
+
+#### sbatch script
+
+```
+#!/bin/bash
+
+#SBATCH --job-name=arrayJob
+#SBATCH --output=arrayJob_%A_%a.out
+#SBATCH --error=arrayJob_%A_%a.err
+#SBATCH --array=1-16
+#SBATCH --time=01:00:00
+#SBATCH --partition=sandyb
+#SBATCH --ntasks=1
+#SBATCH --mem-per-cpu=4000
+
+
+######################
+# Begin work section #
+######################
+
+# Print this sub-job's task ID
+mkdir test$$SLURM_ARRAY_TASK_ID
+# this make a directory called test1 .... test16...
+cd test$$SLURM_ARRAY_TASK_ID
+Rscript --verbose Rcc_wrapper.R
+
+```
+
+### questions
+
+- I tried the `args` this in .sbatch and .R script and it doesn't work. Is there any to pass this argument in the .sbatch file into R file just like what pps example did?
+
+- I tried the `INDIR=/mnt/lustre/home/weidong/lvbsim/diag` and `cd ${INDIR}` in .sbatch script and it doesn't work. Is there any way to do that?
+
+- Could you please show some example to run .R file multiple time in RCC and point to specific output directory with the output file having name like output1.txt, ....output10.txt...  Within this process, I have need to creat some folder called test1 ... test10 to restore my missindex.mat file each time.
+
+#### more details
+
+I am running 4 methods on missing data imputation and compare them. So for each data I have, I would like to generate some index and throw away the data points corresponding to these index. By applying those 4 methods we can predict the missing value and compare with the true value which we throw away. In this way we can calculate the RMSE for this data and this missing index. I would like to this many times. 
+
+Let's say I would do this procedure 100 times on each data. For each time, I need to restore the missing index somewhere as a .mat file to run matlab function. I also need to restore the output of the matlab funtion to compare with the output of R functions. I would like restore all the output into a .txt file somewhere in each time to aggregate the result finally.
+
+I kind of make this procedure work but in a very silly way. I think the solution in the PPS example is better and neat. Is there any way I can do something in RCC similar with the PPS example?
+
+## Thanks a lot!
+
+
+
+
+
+
+
+
+
+
+
+## Session information
+
+```{r info, echo = FALSE}
+sessionInfo()
+```

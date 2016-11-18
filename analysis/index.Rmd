@@ -12,3 +12,4 @@ title: "Home"
 *  [Estimation of rank](rankestimation.html)
 *  [Example for preparing DSC](preDCS.html)
 *  [Example for mix variance structure](testmixvar.html)
+*  [Questions for Peter](RCCquestion.html)
